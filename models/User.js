@@ -13,13 +13,12 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Parameter 'email' should be specified"],
     match: [/\S+@\S+\.\S+/, 'Email is invalid']
   },
-  firstName: String,
-  lastName: String,
-  birthDate: Date,
-  bio: String,
-  image: String,
-  hash: String,
-  salt: String
+  firstName: { type: String, default: '' },
+  lastName: { type: String, default: '' },
+  bio: { type: String, default: '' },
+  image: { type: String, default: '' },
+  hash: { type: String, default: '' },
+  salt: { type: String, default: '' }
 }, {
   timestamps: true
 });

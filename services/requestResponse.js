@@ -39,7 +39,9 @@ exports.success = (fieldName, fieldVal) => {
         return obj;
       }, {})
     } else {
-      response.data = fieldVal;
+      response.data = {
+        [fieldName]: fieldVal
+      }
     }
   }
 

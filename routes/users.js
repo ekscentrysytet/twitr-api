@@ -7,9 +7,11 @@ const url = require('url');
 const co = require('co');
 const requestResponse = require('../services/requestResponse');
 
+const storageFolder = 'media/users/images';
+
 const storage = multer.diskStorage({
   destination(req, file, cb) {
-    cb(null, './public/users/images');
+    cb(null, `./${storageFolder}`);
   },
   filename(req, file, cb) {
     let fileArr = file.originalname.split('.');
@@ -60,7 +62,7 @@ usersRouter
     user.setPassword(req.body.password);
 
     user.save()
-      .then(() => res.status(201).json(requestResponse.success('user', user.getAuthJSON())))
+      .then(user => res.status(201).json(requestResponse.success(['user', 'token'], [user, user.generateJWT()])))
       .catch(next);
   })
 
@@ -103,9 +105,15 @@ usersRouter
         if (req.fileValidationError)
           return res.status(422).json(requestResponse.error('invalidFile'));
 
-        const absUrl = req.file.path.replace('public', '');
+        user.image = `${req.protocol}://${req.get('host')}/${storageFolder}/${req.file.filename}`;
 
-        return res.json(requestResponse.success('url', `${req.protocol}://${req.get('host') + absUrl}`));
+        return user.save()
+          .then(() => {
+            return res.json(requestResponse.success(null, {
+              image: user.image
+            }));
+          })
+          .catch(next);
       })
       .catch(next)
   })

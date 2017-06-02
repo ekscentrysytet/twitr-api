@@ -53,7 +53,14 @@ postsRouter
 
   .get('/:postId', auth, (req, res, next) => {
     return Post.findOne({id: req.params.postId}, {_id: 0})
-      .populate('comments')
+      .populate('author')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'author'
+        }
+      })
+      .exec()
       .then(post => {
         if (!post)
           return res.status(404).json(requestResponse.error('postId', req.params.postId));
@@ -82,7 +89,7 @@ postsRouter
       if (!user)
         throw new Error('userId');
 
-      let post = new Post(req.body);
+      const post = new Post(req.body);
       post.author = user;
 
       const newPost = yield post.save();
@@ -124,7 +131,7 @@ postsRouter
 
       if (!post)
         throw new Error('postId');
-      console.log(post.author);
+
       if (req.user.id !== post.author.toString())
         throw new Error('noRights');
 

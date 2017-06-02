@@ -5,6 +5,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const cors = require('cors');
 
 const routes = require('./routes');
 
@@ -23,6 +24,8 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/media', express.static(path.join(__dirname, 'media')));
+app.use(cors());
 
 require('./config/passport');
 
@@ -62,7 +65,7 @@ if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     
-    res.render('error', {
+    res.json({
       message: err.message,
       error: err
     });

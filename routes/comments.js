@@ -36,15 +36,18 @@ commentsRouter
       if (!user)
         throw new Error('userId');
 
-      const post = yield Post.findOne({id: req.query.postId}).populate('author');
+      const post = yield Post.findOne({id: req.query.postId});
 
       if (!post)
         throw new Error('postId');
 
-      comment.post = post;
       comment.author = user;
 
       const savedComment = yield comment.save();
+
+      post.comments.push(comment);
+
+      const savedPost = yield post.save();
 
       return savedComment;
     })
